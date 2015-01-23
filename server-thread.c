@@ -6,7 +6,7 @@ Serveur à lancer avant le client
 #include <linux/types.h> 	/* pour les sockets */
 #include <sys/socket.h>
 #include <netdb.h> 		/* pour hostent, servent */
-#include <string.h> 		/* pour bcopy, ... */  
+#include <string.h> 		/* pour bcopy, ... */
 #define TAILLE_MAX_NOM 256
 #include <pthread.h>
 
@@ -32,24 +32,24 @@ void* prise_en_charge_client(void* sock)
 
 
     if ((longueur = read(sd, buffer, sizeof(buffer))) <= 0)
-    	printf("erreur de lecture de la trame envoyer par le client ")
+    	printf("erreur de lecture de la trame envoyer par le client ");
 
     printf("message lu : %s \n", buffer);
-    
+
     buffer[0] = 'R';
     buffer[1] = 'E';
     buffer[longueur] = '#';
     buffer[longueur+1] ='\0';
-    
+
     printf("message apres traitement : %s \n", buffer);
-    
+
     printf("renvoi du message traite.\n");
 
     /* mise en attente du prgramme pour simuler un delai de transmission */
     //sleep(3);
-    
+
     write(sd,buffer,strlen(buffer)+1);
-    
+
     printf("message envoye. \n");
 
     return NULL;
@@ -70,17 +70,17 @@ main(int argc, char **argv) {
     hostent*		ptr_hote; 			/* les infos recuperees sur la machine hote */
     servent*		ptr_service; 			/* les infos recuperees sur le service de la machine */
     char 		machine[TAILLE_MAX_NOM+1]; 	/* nom de la machine locale */
-    
+
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
-    
+
     /* recuperation de la structure d'adresse en utilisant le nom */
     if ((ptr_hote = gethostbyname(machine)) == NULL) {
 		perror("erreur : impossible de trouver le serveur a partir de son nom.");
 		exit(1);
     }
-    
-    /* initialisation de la structure adresse_locale avec les infos recuperees */			
-    
+
+    /* initialisation de la structure adresse_locale avec les infos recuperees */
+
     /* copie de ptr_hote vers adresse_locale */
     bcopy((char*)ptr_hote->h_addr, (char*)&adresse_locale.sin_addr, ptr_hote->h_length);
     adresse_locale.sin_family		= ptr_hote->h_addrtype; 	/* ou AF_INET */
@@ -88,7 +88,7 @@ main(int argc, char **argv) {
 
     /* 2 facons de definir le service que l'on va utiliser a distance */
     /* (commenter l'une ou l'autre des solutions) */
-    
+
     /*-----------------------------------------------------------*/
     /* SOLUTION 1 : utiliser un service existant, par ex. "irc" */
     /*
@@ -102,10 +102,10 @@ main(int argc, char **argv) {
     /* SOLUTION 2 : utiliser un nouveau numero de port */
     adresse_locale.sin_port = htons(4999);
     /*-----------------------------------------------------------*/
-    
-    printf("numero de port pour la connexion au serveur : %d \n", 
+
+    printf("numero de port pour la connexion au serveur : %d \n",
 		   ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
-    
+
     /* creation de la socket */
 
 
@@ -127,9 +127,9 @@ main(int argc, char **argv) {
     for(;;) {
 
 		longueur_adresse_courante = sizeof(adresse_client_courant);
-		
+
 		/* adresse_client_courant sera renseigné par accept via les infos du connect */
- 	 if ((nouv_socket_descriptor = accept(socket_descriptor, 
+ 	 if ((nouv_socket_descriptor = accept(socket_descriptor,
 			       (sockaddr*)(&adresse_client_courant),
 				       &longueur_adresse_courante))< 0) {
 			perror("erreur : impossible d'accepter la connexion avec le client.");
@@ -141,8 +141,8 @@ main(int argc, char **argv) {
 		{
 			perror("Impossible de creer le thread");
 			return -1;
-		}	
-	
+		}
+
 
 	}
 
@@ -150,3 +150,4 @@ main(int argc, char **argv) {
     close(nouv_socket_descriptor);
 
 }
+
