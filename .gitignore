@@ -1,0 +1,9 @@
+.*
+
+
+*.o
+
+# executable
+server
+client
+
