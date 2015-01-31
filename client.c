@@ -8,11 +8,72 @@ client <adresse-serveur> <message-a-transmettre>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
+#include <string.h>
 
 typedef struct sockaddr 	sockaddr;
 typedef struct sockaddr_in 	sockaddr_in;
 typedef struct hostent 		hostent;
 typedef struct servent 		servent;
+
+
+// envoyer la taille du fichier sur le serveur puis recevoir le fichier et comparer la taille reçu !
+
+long taille_fichier(FILE* fichier){
+
+	long tailleFichier=-1;
+
+	if(fichier){
+		tailleFichier=ftell(fichier);
+		fclose (fichier);
+	}
+
+return tailleFichier;
+
+}
+
+
+// voir Fread() pour lire octet par octet  un fichier et le découpé en buffer
+int transfert_fichier(int socket_descriptor,const char * fileName){
+
+	FILE* fichier;
+	fichier = fopen(fileName,"ab"); //"données.txt"
+
+	long fileSize = taille_fichier(fichier);
+
+
+	//réouverture car l'ouverture  précédente avec ab place la tête de lecture a la fin du fichier
+	fichier = fopen(fileName,"rb");
+    int tailleName=strlen(fileName);
+    
+
+	int sent=send(socket_descriptor,&fileSize,sizeof(long),0);
+	
+
+		 sent= send(socket_descriptor,fileName,strlen(fileName),0);
+		printf("envoyer : %d \n",sent);
+	//}
+
+
+    char sendBuffer[255];
+    int bytesRead = fread(sendBuffer,1, sizeof(sendBuffer), fichier);
+
+    while(!feof(fichier))
+    {
+      //TODO: check for errors here
+      send(socket_descriptor, sendBuffer, bytesRead, 0);
+      bytesRead = fread(sendBuffer, 1,sizeof(sendBuffer), fichier);
+
+    } 
+
+
+    close(socket_descriptor);
+    fclose(fichier);
+
+    return 1;
+}
+
 
 int main(int argc, char **argv) {
   
@@ -24,26 +85,28 @@ int main(int argc, char **argv) {
     char 	buffer[256];
     char *	prog; 			/* nom du programme */
     char *	host; 			/* nom de la machine distante */
-    char *	mesg; 			/* message envoyé */
+    char *	filePath; 			/* chemain du fichier à envoyée */
      
     if (argc != 3) {
-	perror("usage : client <adresse-serveur> <message-a-transmettre>");
+	perror("usage : client <adresse-serveur> <chemin du fichier à transmettre>");
 	exit(1);
     }
    
     prog = argv[0];
     host = argv[1];
-    mesg = argv[2];
+    filePath= argv[2];
     
-    printf("nom de l'executable : %s \n", prog);
-    printf("adresse du serveur  : %s \n", host);
-    printf("message envoye      : %s \n", mesg);
+   // printf("nom de l'executable : %s \n", prog);
+   // printf("adresse du serveur  : %s \n", host);
+    printf("fichier envoyée      : %s \n", filePath);
     
     if ((ptr_host = gethostbyname(host)) == NULL) {
 	perror("erreur : impossible de trouver le serveur a partir de son adresse.");
 	exit(1);
     }
     
+
+
     /* copie caractere par caractere des infos de ptr_host vers adresse_locale */
     bcopy((char*)ptr_host->h_addr, (char*)&adresse_locale.sin_addr, ptr_host->h_length);
     adresse_locale.sin_family = AF_INET; /* ou ptr_host->h_addrtype; */
@@ -84,24 +147,25 @@ int main(int argc, char **argv) {
     printf("connexion etablie avec le serveur. \n");
     
     printf("envoi d'un message au serveur. \n");
-      
+
+    transfert_fichier(socket_descriptor,filePath);
+
     /* envoi du message vers le serveur */
-    if ((write(socket_descriptor, mesg, strlen(mesg))) < 0) {
-	perror("erreur : impossible d'ecrire le message destine au serveur.");
-	exit(1);
-    }
-    
+
+    // todo : envoyer le fichier a la place du nom de fichier
+
+
     /* mise en attente du prgramme pour simuler un delai de transmission */
-    sleep(3);
+    //sleep(3);
      
     printf("message envoye au serveur. \n");
-                
+
     /* lecture de la reponse en provenance du serveur */
     while((longueur = read(socket_descriptor, buffer, sizeof(buffer))) > 0) {
-	printf("reponse du serveur : \n");
-	write(1,buffer,longueur);
+    	printf("reponse du serveur : \n");
+    	write(1,buffer,longueur);
     }
-    
+
     printf("\nfin de la reception.\n");
     
     close(socket_descriptor);
