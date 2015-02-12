@@ -22,13 +22,17 @@ void* prise_en_charge_client(void* sock)
 	int *tmp = (int*) sock;
 	int socketDescriptor = *tmp;
 	long  tailleFichier = 0;
-	//char nomDeFichier[13];
-	char * nomDeFichier = malloc(sizeof(char));
+	int tailleNomFichier=0;
 	int longueur;
 	int aRecevoir=0;
 	unsigned char *bufferFile;
 
 	FILE * fichier; // création du future fichier réassemblé.
+
+	int tnr= recv(socketDescriptor,&tailleNomFichier,sizeof(int),0);
+
+	char * nomDeFichier= malloc(tailleNomFichier);
+
 
 	//reception de la taille du fichier
 	int tailleRecu= recv(socketDescriptor,&tailleFichier,sizeof(long),0);
@@ -40,8 +44,7 @@ void* prise_en_charge_client(void* sock)
 		 //reception du nom de fichier
 		 int nomRecu= recv(socketDescriptor,nomDeFichier,sizeof(nomDeFichier),0);
 
-
-		 	 if(nomRecu<0){
+		 	 if(nomRecu<=0){
 	 	 		 perror("erreur de la réception du nom de fichier ");
 	 	 	 }
 	  }else{
@@ -57,12 +60,13 @@ void* prise_en_charge_client(void* sock)
 	 // bzero(bufferFile,256);
 	 fichier=fopen("exemple.pdf","wb");
 
-	 char recvBuff[1500];
+	 char recvBuff[1450];
   
     int bytesReceived = recv(socketDescriptor, recvBuff,sizeof(recvBuff), 0);
+    printf("%d\n",bytesReceived);
     while(bytesReceived != 0)
     {
-
+      printf("%d\n",bytesReceived);
       // you should add error checking here
       fwrite(recvBuff, bytesReceived, 1, fichier);
 
@@ -95,9 +99,8 @@ main(int argc, char **argv) {
     char 		machine[TAILLE_MAX_NOM+1]; 	/* nom de la machine locale */
     
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
-    
     /* recuperation de la structure d'adresse en utilisant le nom */
-    if ((ptr_hote = gethostbyname(machine)) == NULL) {
+    if ((ptr_hote = gethostbyname("localhost")) == NULL) {
 		perror("erreur : impossible de trouver le serveur a partir de son nom.");
 		exit(1);
     }

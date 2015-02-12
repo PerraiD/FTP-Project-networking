@@ -35,35 +35,34 @@ return tailleFichier;
 
 
 // voir Fread() pour lire octet par octet  un fichier et le découpé en buffer
-int transfert_fichier(int socket_descriptor,const char * fileName){
+int transfert_fichier(int socket_descriptor,char * fileName){
 
 	FILE* fichier;
 	fichier = fopen(fileName,"ab"); //"données.txt"
-
+   
 	long fileSize = taille_fichier(fichier);
-
 
 	//réouverture car l'ouverture  précédente avec ab place la tête de lecture a la fin du fichier
 	fichier = fopen(fileName,"rb");
-    int tailleName=strlen(fileName);
-    
-
-	int sent=send(socket_descriptor,&fileSize,sizeof(long),0);
+    int tailleName=strlen(fileName); 
+  		
+    int sent=send(socket_descriptor,&tailleName,sizeof(int),0);
+			sent=send(socket_descriptor,&fileSize,sizeof(long),0);
 	
 
-		 sent= send(socket_descriptor,fileName,strlen(fileName),0);
-		printf("envoyer : %d \n",sent);
-	//}
+				sent= send(socket_descriptor,fileName,strlen(fileName),0);
+				printf("envoyer : %d \n",sent);
+	
 
 
-    char sendBuffer[255];
-    int bytesRead = fread(sendBuffer,1, sizeof(sendBuffer), fichier);
+    char sendBuffer[1500];
+    int bytesRead = fread(sendBuffer,1, sizeof(fileSize), fichier);
 
     while(!feof(fichier))
     {
       //TODO: check for errors here
       send(socket_descriptor, sendBuffer, bytesRead, 0);
-      bytesRead = fread(sendBuffer, 1,sizeof(sendBuffer), fichier);
+      bytesRead = fread(sendBuffer, 1,sizeof(fileSize), fichier);
 
     } 
 
@@ -85,7 +84,7 @@ int main(int argc, char **argv) {
     char 	buffer[256];
     char *	prog; 			/* nom du programme */
     char *	host; 			/* nom de la machine distante */
-    char *	filePath; 			/* chemain du fichier à envoyée */
+    char * filePath; 		/* chemain du fichier à envoyée */
      
     if (argc != 3) {
 	perror("usage : client <adresse-serveur> <chemin du fichier à transmettre>");
@@ -98,14 +97,11 @@ int main(int argc, char **argv) {
     
    // printf("nom de l'executable : %s \n", prog);
    // printf("adresse du serveur  : %s \n", host);
-    printf("fichier envoyée      : %s \n", filePath);
     
     if ((ptr_host = gethostbyname(host)) == NULL) {
 	perror("erreur : impossible de trouver le serveur a partir de son adresse.");
 	exit(1);
     }
-    
-
 
     /* copie caractere par caractere des infos de ptr_host vers adresse_locale */
     bcopy((char*)ptr_host->h_addr, (char*)&adresse_locale.sin_addr, ptr_host->h_length);
