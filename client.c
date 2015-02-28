@@ -135,13 +135,9 @@ int main(int argc, char **argv) {
 
                 if(execute_action(DOWLOAD,socket_descriptor)>0){
                      //send du nom de fichier;
-                    int sizeN= strlen(filePath);
-
-                    int sentTailleN = send(socket_descriptor,&sizeN,sizeof(int),0);
-                    int sentName=send(socket_descriptor,filePath,strlen(filePath),0);
-                    if(sentName>0){
-                        reception_fichier(&socket_descriptor);
-                    }
+                     send_string(socket_descriptor,filePath);
+                     reception_fichier(&socket_descriptor);
+                           
                 }else{
                     perror("l'action que vous avez demandé n'a pas pu aboutir");
                 }

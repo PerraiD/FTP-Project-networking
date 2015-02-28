@@ -20,8 +20,6 @@ return sent;
 }
 
 
-
-
 /**
 	fonction d'optention de la taille d'un fichier
 */
@@ -39,6 +37,53 @@ return tailleFichier;
 
 }
 
+
+/**
+	fonction de réception d'une chaine
+*/
+
+char * recv_string(int socket){
+
+	int tStrg; // taille de la string
+    char * strg; // la string a recevoir
+
+    if(recv(socket,&tStrg,sizeof(int),0)>0){
+
+		strg= malloc(sizeof(char)*(tStrg+1));
+     	//réception de la string
+    	if(recv(socket,strg,sizeof(char)*(tStrg),0)>0){
+    		strg[tStrg] = '\0';	
+    	}
+     	 else{
+     		perror("erreur de reception de la chaine"); 	
+     	 }
+
+    }else{
+    	perror("erreur de reception de la chaine");
+    }
+
+    return strg;
+}
+
+
+/**
+	fonction d'envoie d'une chaine
+*/
+
+void send_string(int socket,char * chaine){
+
+	int sizeS= strlen(chaine);
+
+	if(send(socket,&sizeS,sizeof(int),0)>0){
+		if(send(socket,chaine,strlen(chaine),0)<0){
+			perror("problème d'envoie de la chaine");
+		}
+	}else{
+		perror("problème d'envoie de la chaine");
+	}
+}
+
+
 /**
 	fonction d'extraction du nom du fichier a partir d'un chemin absolue ou relatif saisie
 	!!! ATTENTION le pointeur est directement modifier  donc filepath=/doc/machin devient filepath=machin.!!
@@ -48,18 +93,18 @@ return tailleFichier;
 
 void exctract_file_name(char * filePath){
 
-                char * strTmp;
-                char * toFree;
-                
-                toFree = strdup(filePath);
+    char * strTmp;
+    char * toFree;
+    
+    toFree = strdup(filePath);
 
-                while ((strTmp = strsep(&toFree, "/")) != NULL)
-                {   
-                
-                    strcpy(filePath,strTmp);
-                }
+    while ((strTmp = strsep(&toFree, "/")) != NULL)
+    {   
+    
+        strcpy(filePath,strTmp);
+    }
 
-                free(toFree);
+    free(toFree);
                   
 }
 
@@ -81,17 +126,12 @@ int transfert_fichier(int socket_descriptor,char * filePath){
 	//réecriture de filepath en fileName si pas de / filepath n'est pas modifier
 	exctract_file_name(filePath);
 	printf(" nom du fichier : %s\n",filePath);
-    int tailleName=strlen(filePath);
+    
+    //send du nom
+    send_string(socket_descriptor,filePath);
 
-    //envoie de la taille du nom
-    int sent=send(socket_descriptor,&tailleName,sizeof(int),0);
-				//envoie de la taille du fichier
-			sent=send(socket_descriptor,&fileSize,sizeof(long),0);
-				//envoie du nom de fichier 
-				sent= send(socket_descriptor,filePath,strlen(filePath),0);
-				printf("envoyer : %d \n",sent);
-
-
+    //envoie de la taille du fichier a recevoir.
+    int sent=send(socket_descriptor,&fileSize,sizeof(long),0);
 
     //envoie du fichier.
     char sendBuffer[BUFFER_MAX_SIZE];
@@ -130,34 +170,17 @@ void* reception_fichier(void* sock)
 
     FILE * fichier; // création du future fichier réassemblé.
 
-    int tnr= recv(socketDescriptor,&tailleNomFichier,sizeof(int),0);
-    if (tnr <= 0) {
-        perror("erreur de réception");
-    }
+ 
 
-    //printf(" taille nom de fichier %d\n", tailleNomFichier);
-
-    char * nomDeFichier= malloc(sizeof(char)*(tailleNomFichier+1));
-
-
-
+    char * nomDeFichier= recv_string(socketDescriptor);
+    printf(" nom du fichier reçu : %s\n", nomDeFichier);
     //reception de la taille du fichier
     int tailleRecu= recv(socketDescriptor,&tailleFichier,sizeof(long),0);
 
 
     //verification de la bonne réception d'un fichier -1 en cas d'erreur
     if(tailleRecu > 0){
-
-        //reception du nom de fichier
-
-        int nomRecu= recv(socketDescriptor,nomDeFichier,sizeof(char)*(tailleNomFichier),0);
-        nomDeFichier[tailleNomFichier] = '\0';
-
-        if(nomRecu<=0){
-            perror("erreur de la réception du nom de fichier ");
-        }
-    }else{
-        perror("erreur de la réception de la taille du fichier");
+    	perror("erreur de la réception de la taille du fichier");
     }
 
     printf("taille du fichier a recevoir: %ld \n", tailleFichier);
@@ -207,6 +230,10 @@ void* reception_fichier(void* sock)
 
 
 }
+
+
+
+
 
 
 

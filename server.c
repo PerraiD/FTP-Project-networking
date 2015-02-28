@@ -105,8 +105,6 @@ int main(int argc, char **argv) {
           
             
             int actionR= recv(nouv_socket_descriptor,&action,sizeof(int),0);
-            int tname;
-            int tnameR;
             char * nomDeFichier;
 
             if(actionR>0){ // si une action est envoyer par le client on la traite
@@ -121,18 +119,14 @@ int main(int argc, char **argv) {
                             //reception du nom de fichier a envoyer au client
                             //todo vérification de la réception des éléments
                             
-                            //réception de la taille du nom
-                            tnameR=recv(nouv_socket_descriptor,&tname,sizeof(int),0);
-
-                            nomDeFichier= malloc(sizeof(char)*(tname+1));
                             //réception du nom
-                            int nomRecu= recv(nouv_socket_descriptor,nomDeFichier,sizeof(char)*(tname),0);
-                            nomDeFichier[tname] = '\0';
-
-                            if(nomRecu>0){
-                                //envoie du fichier au client.
-                                transfert_fichier(nouv_socket_descriptor,nomDeFichier);        
+                            nomDeFichier= recv_string(socket_descriptor);
+                            //transfert du fichier demander;
+                            if(nomDeFichier != NULL){
+                                transfert_fichier(nouv_socket_descriptor,nomDeFichier);    
                             }
+                                    
+                            
                         
                         break;
                     }
