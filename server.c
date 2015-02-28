@@ -8,15 +8,10 @@
 #include <sys/stat.h>
 #include <netdb.h> 		/* pour hostent, servent */
 #include <string.h> 		/* pour bcopy, ... */
-
+#include "libnet.c" 
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 
-#define TAILLE_MAX_NOM 256
-
-#define HOME_SERVER "/tmp/filesFTP"
-
-#define BUFFER_MAX_SIZE 1500
 
 typedef struct sockaddr sockaddr;
 typedef struct sockaddr_in sockaddr_in;
@@ -24,92 +19,7 @@ typedef struct hostent hostent;
 typedef struct servent servent;
 
 /*------------------------------------------------------*/
-void* prise_en_charge_client(void* sock)
-{
 
-    //cast du socket
-    int *tmp = (int*) sock;
-    int socketDescriptor = *tmp;
-    long  tailleFichier = 0;
-    int tailleNomFichier=0;
-
-    FILE * fichier; // création du future fichier réassemblé.
-
-    int tnr= recv(socketDescriptor,&tailleNomFichier,sizeof(int),0);
-    if (tnr <= 0) {
-        perror("erreur de réception");
-    }
-
-    printf("%d\n", tailleNomFichier);
-
-    char * nomDeFichier= malloc(sizeof(char)*(tailleNomFichier+1));
-
-
-
-    //reception de la taille du fichier
-    int tailleRecu= recv(socketDescriptor,&tailleFichier,sizeof(long),0);
-
-
-    //verification de la bonne réception d'un fichier -1 en cas d'erreur
-    if(tailleRecu > 0){
-
-        //reception du nom de fichier
-
-        int nomRecu= recv(socketDescriptor,nomDeFichier,sizeof(char)*(tailleNomFichier),0);
-        nomDeFichier[tailleNomFichier] = '\0';
-
-        if(nomRecu<=0){
-            perror("erreur de la réception du nom de fichier ");
-        }
-    }else{
-        perror("erreur de la réception de la taille du fichier");
-    }
-
-    printf("taille du fichier a recevoir: %ld \n", tailleFichier);
-    printf("nom du fichier a recevoir : %s \n",nomDeFichier);
-
-    char * path = malloc(sizeof(char)*(strlen(HOME_SERVER) + strlen(nomDeFichier) + 2));
-    strcpy(path, HOME_SERVER);
-    strcat(path, "/");
-    strcat(path, nomDeFichier);
-
-    printf("%s \n", path);
-
-    fichier = fopen(path, "wb");
-    if (fichier != NULL) {
-
-        char recvBuff[BUFFER_MAX_SIZE];
-
-        //        int bytesReceived = recv(socketDescriptor, recvBuff,sizeof(char)*BUFFER_MAX_SIZE, 0);
-        int bytesReceived = recv(socketDescriptor, recvBuff,sizeof(recvBuff), 0);
-
-        printf("%d\n",bytesReceived);
-        while(bytesReceived != 0)
-        {
-            printf("%d\n",bytesReceived);
-            // you should add error checking here
-            fwrite(recvBuff, bytesReceived, 1, fichier);
-
-            //          bytesReceived = recv(socketDescriptor, recvBuff, sizeof(char)*BUFFER_MAX_SIZE, 0);
-            bytesReceived = recv(socketDescriptor, recvBuff, sizeof(recvBuff), 0);
-        }
-
-        fclose(fichier);
-
-    }
-    else
-    {
-        perror("erreur impossible d'ouvrir le fichier");
-    }
-    close(socketDescriptor);
-
-
-    printf("message envoye. \n");
-
-    return NULL;
-
-
-}
 /*------------------------------------------------------*/
 
 /*------------------------------------------------------*/
@@ -117,11 +27,14 @@ int main(int argc, char **argv) {
 
     int 		socket_descriptor, 		/* descripteur de socket */
                 nouv_socket_descriptor, 	/* [nouveau] descripteur de socket */
-                longueur_adresse_courante; 	/* longueur d'adresse courante d'un client */
+                longueur_adresse_courante, /* longueur d'adresse courante d'un client */
+                action; // action courante demander par le client.
+
     sockaddr_in 	adresse_locale, 		/* structure d'adresse locale*/
                     adresse_client_courant; 	/* adresse client courant */
     hostent*		ptr_hote; 			/* les infos recuperees sur la machine hote */
     char 		machine[TAILLE_MAX_NOM+1]; 	/* nom de la machine locale */
+    char        filePath[TAILLE_MAX_NOM];
 
     gethostname(machine,TAILLE_MAX_NOM);		/* recuperation du nom de la machine */
     /* recuperation de la structure d'adresse en utilisant le nom */
@@ -132,7 +45,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    mkdir(HOME_SERVER, 0777);
+    mkdir(DIR_DL, 0777);
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -182,21 +95,51 @@ int main(int argc, char **argv) {
         longueur_adresse_courante = sizeof(adresse_client_courant);
 
         /* adresse_client_courant sera renseigné par accept via les infos du connect */
-        if ((nouv_socket_descriptor =
-             accept(socket_descriptor,
-                    (sockaddr*)(&adresse_client_courant),
-                    &longueur_adresse_courante))
-            < 0) {
+        if ((nouv_socket_descriptor =accept(socket_descriptor, (sockaddr*)(&adresse_client_courant), &longueur_adresse_courante)) < 0) {
             perror("erreur : impossible d'accepter la connexion avec le client.");
             exit(1);
         }
         int pid = fork();
 
         if (pid == 0) {
-            /* traitement du message */
-            printf("reception d'un message.\n");
+          
+            
+            int actionR= recv(nouv_socket_descriptor,&action,sizeof(int),0);
+            int tname;
+            int tnameR;
+            char * nomDeFichier;
 
-            prise_en_charge_client(&nouv_socket_descriptor);
+            if(actionR>0){ // si une action est envoyer par le client on la traite
+                    switch(action){
+                        case UPLOAD :
+
+                        reception_fichier(&nouv_socket_descriptor);
+
+                        break;
+
+                        case DOWLOAD : 
+                            //reception du nom de fichier a envoyer au client
+                            //todo vérification de la réception des éléments
+                            
+                            //réception de la taille du nom
+                            tnameR=recv(nouv_socket_descriptor,&tname,sizeof(int),0);
+
+                            nomDeFichier= malloc(sizeof(char)*(tname+1));
+                            //réception du nom
+                            int nomRecu= recv(nouv_socket_descriptor,nomDeFichier,sizeof(char)*(tname),0);
+                            nomDeFichier[tname] = '\0';
+
+                            if(nomRecu>0){
+                                //envoie du fichier au client.
+                                transfert_fichier(nouv_socket_descriptor,nomDeFichier);        
+                            }
+                        
+                        break;
+                    }
+
+                        
+                }   
+            
 
             exit(0);
 
