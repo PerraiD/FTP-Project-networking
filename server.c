@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+
     /* initialisation de la file d'ecoute */
     listen(socket_descriptor,5);
 
@@ -99,35 +100,57 @@ int main(int argc, char **argv) {
             perror("erreur : impossible d'accepter la connexion avec le client.");
             exit(1);
         }
+
+
+
         int pid = fork();
 
+
         if (pid == 0) {
-          
-            
+           
+
             int actionR= recv(nouv_socket_descriptor,&action,sizeof(int),0);
             char * nomDeFichier;
+            
+
 
             if(actionR>0){ // si une action est envoyer par le client on la traite
+                   
                     switch(action){
-                        case UPLOAD :
+                        
+                        case UPLOAD:
+                            printf("action UPLOAD \n");
+                            //envoie du path au client.
 
-                        reception_fichier(&nouv_socket_descriptor);
+                                // out_cmd ne fonctionne pas sur le serveur ! oui coté client 
+                                // voir le fait que sa soit pid. et que le popen ouvre un pipe.
+
+                            //send_cmd(PWD_CMD,nouv_socket_descriptor);
+
+                            reception_fichier(&nouv_socket_descriptor);
 
                         break;
 
-                        case DOWLOAD : 
+                        case DOWLOAD: 
+                            printf("action DOWNLAOD \n");
                             //reception du nom de fichier a envoyer au client
                             //todo vérification de la réception des éléments
                             
                             //réception du nom
-                            nomDeFichier= recv_string(socket_descriptor);
+                            nomDeFichier= recv_string(nouv_socket_descriptor);
                             //transfert du fichier demander;
                             if(nomDeFichier != NULL){
                                 transfert_fichier(nouv_socket_descriptor,nomDeFichier);    
                             }
-                                    
+                        break;
+
+                        case PWD_CMD:
+                           
+
                             
-                        
+                            //send_string(nouv_socket_descriptor,contents);
+                            //send_cmd(LS_CMD,nouv_socket_descriptor);
+                            
                         break;
                     }
 

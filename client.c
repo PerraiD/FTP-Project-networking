@@ -101,28 +101,34 @@ int main(int argc, char **argv) {
     printf(" <<< connexion etablie avec le serveur FTP.>>>> \n \n");
 
     
-    int choix = 0;
+
+
+    int choix = 10;
+    char * contents;
     while(choix != EXIT){
 
         printf("Choissisez votre action en indiquant le numéro : \n");
         printf("1 - télécharger un fichier sur le serveur (PUT) \n");
         printf("2 - télécharger un ficher  du serveur (GET) \n");
         printf("3 - executer une commande sur le serveur \n");
-        printf("4 - quittez\n");
+        printf("0 - quittez\n");
         scanf("%d",&choix);
 
         switch(choix){
             case UPLOAD:
-                
-                printf("indiquez le chemin absolue du fichier que vous souhaitez envoyer : \n");
-                //affichage du fichier courant sur le serveur pwd;
-                // possibilité de faire une commande 
-                scanf("%s",filePath);
 
                 //on avertie le serveur de ce que l'on veux faire
                 if(execute_action(UPLOAD,socket_descriptor)>0){
-                    //transfert du fichier.
-                    transfert_fichier(socket_descriptor,filePath);
+                   
+                    //affichage du fichier courant sur le serveur pwd;
+                    //reception de la commande pwd; 
+                    
+
+                     printf("indiquez le chemin absolue du fichier que vous souhaitez envoyer : \n");
+                     // possibilité de faire une commande
+                     scanf("%s",filePath);
+                     //transfert du fichier.
+                     transfert_fichier(socket_descriptor,filePath);
                 }
 
             break;
@@ -144,11 +150,14 @@ int main(int argc, char **argv) {
 
 
             break;
-            case COMMAND:
+            //case COMMAND:
 
-            break;
+            //break;
             case EXIT: 
-                exit(0);
+            close(socket_descriptor);
+
+            printf("connexion avec le serveur fermee, fin du programme.\n");
+            exit(0);
             break;
 
 
@@ -170,9 +179,7 @@ int main(int argc, char **argv) {
 
     printf("\nfin de la reception.\n");
 
-    close(socket_descriptor);
-
-    printf("connexion avec le serveur fermee, fin du programme.\n");
+    
 
     exit(0);
 

@@ -4,8 +4,10 @@
 
 #define UPLOAD 1
 #define DOWLOAD 2
-#define	COMMAND 3 
-#define EXIT 4
+#define	LS_CMD 3
+#define PWD_CMD 4 
+#define CD_CMD 5
+#define EXIT 0
 
 
 
@@ -13,7 +15,7 @@
 	envoie du code d'action au serveur.
 */
 int execute_action(int action,int socket){
-
+	  printf("envoie de l'action numéro %d \n", action);
 	  int sent=send(socket,&action,sizeof(int),0);
 
 return sent;
@@ -59,7 +61,7 @@ char * recv_string(int socket){
      	 }
 
     }else{
-    	perror("erreur de reception de la chaine");
+    	perror("erreur de reception de la taille de chaine");
     }
 
     return strg;
@@ -231,7 +233,57 @@ void* reception_fichier(void* sock)
 
 }
 
+/**
+	fonction de récupération de la sortie d'une commande system 
+*/
 
+void out_cmd(char * cmd, char * contents, int sz){
+	FILE* cmdF;
+
+	cmdF=popen(cmd,"r");
+
+	if(cmdF!=NULL){
+	
+		fgets(contents,sz, cmdF); 
+    	
+	}else{
+		pclose(cmdF);
+		perror("commande interrompu");
+	}
+ 	pclose(cmdF);
+}
+
+/**
+	fonction d'envoie de la sortie d'une commande system 
+*/
+
+// a voir pour l'histoire d'un chemin fictif pour le pwd ou seulement dans les sous dossier du serveur.
+void send_cmd(int cmd,int socket){
+	
+	 char * contents; 
+
+	switch(cmd){
+
+		case PWD_CMD:
+			  //modification par pointeur du contents
+              out_cmd("pwd",contents,200);
+              printf("%s\n",contents);
+              send_string(socket,contents);
+
+		break;
+		case LS_CMD:
+			 
+			  //modification par pointeur du contents
+              out_cmd("ls",contents,200);
+              send_string(socket,contents);	 
+		break;
+
+		case CD_CMD:
+
+		break;
+	}
+
+}
 
 
 
