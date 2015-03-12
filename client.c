@@ -172,14 +172,23 @@ int main(int argc, char **argv) {
                   printf("indiquez le fichier que vous souhaitez télécharger :\n");
                   //affichage du fichier courant
                   scanf("%s",filePath);
-                 
-                  //test de l'existance du fichier sur le serveur
+                  int downOk= 0;
+            
 
                    //envoie du nom de fichier
                     send_string(socket_descriptor,filePath);
-
-                     //file path null car on souhaite qu'il le télécharge dans le dossier courant
-                    reception_fichier(&socket_descriptor,NULL); 
+                    if(recv(socket_descriptor,&downOk,sizeof(int),0) > 0){
+                      //vérification de l'existance du fichier sur le serveur
+                      if(downOk){
+                        //file path null car on souhaite qu'il le télécharge dans le dossier courant
+                        reception_fichier(&socket_descriptor,NULL); 
+                      }else{
+                        printf("le fichier demander n'est pas disponible sur le serveur \n");
+                      }
+                    }else{
+                      printf(" erreur réseau  \n");
+                    }
+                  
                  
 
 

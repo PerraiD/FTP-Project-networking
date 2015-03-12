@@ -195,13 +195,23 @@ int main(int argc, char **argv) {
                                 printf("action DOWNLAOD \n");
                                 //reception du nom de fichier a envoyer au client
                                 //todo vérification de la réception des éléments
-                                   
+                                int downok=0;
                                      
-                                     nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
-                                    //transfert du fichier demander;
-                                    if(nomDeFichier != NULL){
+                                nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
+                                
+                                if(nomDeFichier != NULL){    //transfert du fichier demander;
+                                 if(file_exists(nomDeFichier)){
+                                     downok = 1;
+                                    
+                                    if(send(nouv_socket_descriptor_cmd,&downok,sizeof(int),0)>0){
+                                    
                                         transfert_fichier(nouv_socket_descriptor_cmd,nomDeFichier);
                                     }
+                                 }else { 
+                                    send(nouv_socket_descriptor_cmd,&downok,sizeof(int),0); 
+                                  }
+
+                                }
 
 
                             break;
