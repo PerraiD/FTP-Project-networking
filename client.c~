@@ -2,7 +2,6 @@
 Client a lancer apres le serveur avec la commande :
 client <adresse-serveur>
 ------------------------------------------------------------*/
-#define DIR_DL "./"
 #include <stdlib.h>
 #include <stdio.h>
 #include <linux/types.h>
@@ -17,7 +16,7 @@ client <adresse-serveur>
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 
-
+#define DIR_DL "./"
 
 
 typedef struct sockaddr sockaddr;

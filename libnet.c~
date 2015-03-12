@@ -9,6 +9,7 @@
 #include <unistd.h> // for close
 
 #define TAILLE_MAX_NOM 256
+#define DIR_DL "/tmp/filesFTP" // a revoir !²
 #define BUFFER_MAX_SIZE 1500
 
 #define UPLOAD 1
