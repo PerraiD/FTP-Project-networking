@@ -40,7 +40,7 @@ void send_cmd(char * cmd,int socket){
     delete_retC(cmd_t);
 
     cmdF = popen(cmd_t, "r");
-    char tmp[200]="";
+    char tmp[300]="";
 
 
     if(cmdF!=NULL){
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    mkdir(DIR_DL,777);
+    mkdir(DIR_DL, S_IRUSR | S_IWUSR | S_IRGRP);
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
         if (pid == 0) {
 
             //envoie a la connexion du client du chemin ou il se trouve.
-			
+
            // FILE * pwdC = popen("pwd","r");
             //char  pwd[200];
             //char contents[200]="";
