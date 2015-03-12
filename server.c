@@ -156,8 +156,15 @@ int main(int argc, char **argv) {
         if (pid == 0) {
 
             //envoie a la connexion du client du chemin ou il se trouve.
-			char * pwd= "pwd";
-            send_cmd("pwd",nouv_socket_descriptor_cmd);
+			
+            File * pwdC = popen("pwd","r");
+            char  pwd[200];
+
+            while (fgets(pwd, 200, pwdC) != NULL){
+
+            }
+
+            send_string(nouv_socket_descriptor_cmd,);
             //ACK
             int actionR= recv(nouv_socket_descriptor_cmd,&action,sizeof(int),0);
             char * nomDeFichier;
@@ -250,7 +257,6 @@ int main(int argc, char **argv) {
 								char * path=recv_string(nouv_socket_descriptor_cmd);
                                 delete_retC(path);
 								int f_ok= file_exists(path);
-								printf("%d \n",f_ok);
 								send(nouv_socket_descriptor_cmd,&f_ok,sizeof(int),0);
                             break;
                         }

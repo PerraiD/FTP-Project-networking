@@ -79,15 +79,16 @@ return tailleFichier;
 char * recv_string(int socket){
 
 	int tStrg; // taille de la string
-    char * strg; // la string a recevoir
+  char strg[500]="";
 
     if(recv(socket,&tStrg,sizeof(int),0)>0){
+      printf("%d",tStrg);
 
-		strg= malloc(sizeof(char)*(tStrg+1));
+		  char * TmpStrg= malloc(sizeof(char)*(tStrg+1));
      	//réception de la string
     	if(recv(socket,strg,sizeof(char)*(tStrg),0)>0){
     		strg[tStrg] = '\0';
-       
+        //strcpy(strg,TmpStrg);
     	}
      	 else{
      		perror("erreur de reception de la chaine");
@@ -96,7 +97,8 @@ char * recv_string(int socket){
     }else{
     	perror("erreur de reception de la taille de chaine");
     }
-
+    
+    printf("%s\n",strg);
     return strg;
 }
 

@@ -136,14 +136,8 @@ int main(int argc, char **argv) {
                      // possibilité de faire une commande
                      scanf("%s",filePath);
                      //transfert du fichier.
-                     //envoie du pwd pour que le serveur enregistre le fichier au bon endroit
-                    
-                    
-
-                     //char cmd[100];
-                     //snprintf(cmd,100,"%s %s",pwd,filePath);                   
+                     //envoie du pwd pour que le serveur enregistre le fichier au bon endroit                   
   
-
                      if(file_exists(filePath)){    
                          int sok = 1;
                          int sendok= send(socket_descriptor,&sok,sizeof(int),0);
@@ -189,8 +183,6 @@ int main(int argc, char **argv) {
                       printf(" erreur réseau  \n");
                     }
                   
-                 
-
 
                 }else{
                     perror("l'action que vous avez demandé n'a pas pu aboutir");
@@ -270,16 +262,13 @@ int main(int argc, char **argv) {
                                     strcat(pwd,"/");
                                     strcat(pwd,filePath);
                                   }else{
-                                    printf("on ne peut pas remonter dans le fichier encore");
+                                    printf("on ne peut pas remonter dans le fichier");
                                   }
 
 
                               }else{
                                 printf("le dossier que vous souhaitez atteindre est incorrecte \n");
                               }
-
-                            //voir modification du pwd en fonction du chemin demander
-                            // vérifier l'existance d'un fichier
 
                           }
                         break;
