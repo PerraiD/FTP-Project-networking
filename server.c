@@ -48,6 +48,8 @@ void send_cmd(char * cmd,int socket){
             strcat(tmp,contents);
         }
 
+        strcat(tmp, "\n");
+
         strcpy(contents,tmp);
 
     }else{
