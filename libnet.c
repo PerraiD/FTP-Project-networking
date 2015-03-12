@@ -87,6 +87,7 @@ char * recv_string(int socket){
      	//réception de la string
     	if(recv(socket,strg,sizeof(char)*(tStrg),0)>0){
     		strg[tStrg] = '\0';
+       
     	}
      	 else{
      		perror("erreur de reception de la chaine");
@@ -261,8 +262,8 @@ int reception_fichier(void* sock, char * pathfile)
        strcat(path, "/");
        strcat(path, nomDeFichier);
     }
-    
-
+         
+ 
     fichier = fopen(path, "wb");
     if (fichier != NULL) {
 

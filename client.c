@@ -138,21 +138,28 @@ int main(int argc, char **argv) {
                      //transfert du fichier.
                      //envoie du pwd pour que le serveur enregistre le fichier au bon endroit
                     
-                     send_string(socket_descriptor,pwd);
+                    
 
                      //char cmd[100];
                      //snprintf(cmd,100,"%s %s",pwd,filePath);                   
   
 
-                     if(file_exists(filePath)){                
-                         transfert_fichier(socket_descriptor,filePath);
-                         int rack=recv(socket_descriptor,&ack,sizeof(int),0);
-                         if(rack>1 && ack==1){
-                           printf("fichier correctement envoyée \n");
-                         }else{
-                            perror("erreur de l'envoie de du fichier !");
-                         }
+                     if(file_exists(filePath)){    
+                         int sok = 1;
+                         int sendok= send(socket_descriptor,&sok,sizeof(int),0);
+                         if(sendok >0){ 
+                             send_string(socket_descriptor,pwd);            
+                             transfert_fichier(socket_descriptor,filePath);
+                             int rack=recv(socket_descriptor,&ack,sizeof(int),0);
+                             if(rack>1 && ack==1){
+                               printf("fichier correctement envoyée \n");
+                             }else{
+                                perror("erreur de l'envoie du fichier !");
+                             }
+                          }else{ printf("erreur d'envoie");}
                      }else{
+                        int sok = 0;
+                         int sendok= send(socket_descriptor,&sok,sizeof(int),0);
                       printf("erreur le fichier n'est pas  disponible sur votre espace de travail \n");
 
                   }
@@ -201,8 +208,8 @@ int main(int argc, char **argv) {
                         case LS_CMD:
 
                         if(execute_action(LS_CMD,socket_descriptor)>0){
-                          char cmd[100];
-                          snprintf(cmd,100,"ls %s ",pwd);
+                          char cmd[200];
+                          snprintf(cmd,200,"ls %s ",pwd);
                           int fok=0;
 
                           // on envoie le fichier dans lequel on veux se déplacer.
@@ -215,6 +222,7 @@ int main(int argc, char **argv) {
                               if(fok){
                                 
                                 send_string(socket_descriptor,cmd);
+
                                 char* ls=recv_string(socket_descriptor);
                                 printf("\n contenu du dossier courant : \n");
                                 printf("%s \n",ls);

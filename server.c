@@ -170,17 +170,23 @@ int main(int argc, char **argv) {
 
                             case UPLOAD:
                                 printf("action UPLOAD \n");
-                                
-                                 //fichier sur le serveur ou déposer le fichier.
-                                toDl = recv_string(nouv_socket_descriptor_cmd);
-                                if(toDl != NULL){
-                                           
-                                       if(reception_fichier(&nouv_socket_descriptor_cmd,toDl) == 1){
-                                            ack=1;
-                                            send(nouv_socket_descriptor_cmd,&ack,sizeof(int),0);
-                                        }
-                                }else{
-                                    printf("erreur de reception du chemin ou sauvegarder le fichier");
+                                int upOK=0;
+                                 
+                                int rupok = recv(nouv_socket_descriptor_cmd,&upOK,sizeof(int),0);
+                                printf("%d\n",upOK);
+                                printf("%d\n", rupok );
+                                if(rupok >0 && upOK){
+                                    //fichier sur le serveur ou déposer le fichier.
+                                    toDl = recv_string(nouv_socket_descriptor_cmd);
+                                    if(toDl != NULL ){
+                                               
+                                           if(reception_fichier(&nouv_socket_descriptor_cmd,toDl) == 1){
+                                                ack=1;
+                                                send(nouv_socket_descriptor_cmd,&ack,sizeof(int),0);
+                                            }
+                                    }else{
+                                        printf("erreur de reception du chemin ou sauvegarder le fichier");
+                                    }
                                 }
                                  
                             break;
