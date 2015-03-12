@@ -8,8 +8,7 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 
-#define TAILLE_MAX_NOM 256
-#define DIR_DL "/tmp/filesFTP" // a revoir !
+#define TAILLE_MAX_NOM 250
 #define BUFFER_MAX_SIZE 1500
 
 #define UPLOAD 1
@@ -150,8 +149,7 @@ void exctract_file_name(char * filePath){
 void transfert_fichier(int socket_descriptor,char * filePath){
 
 
-    //voir pour l'ouverture d'une nouvelle socket.
-    
+  
 
   int bytes_written,bytes_to_write;
 
@@ -215,7 +213,7 @@ void transfert_fichier(int socket_descriptor,char * filePath){
 	fonction de réception de fichier
 */
 
-int reception_fichier(void* sock)
+int reception_fichier(void* sock, char * pathfile)
 {
 
     //cast du socket
@@ -244,12 +242,25 @@ int reception_fichier(void* sock)
     printf("taille du fichier a recevoir: %ld \n", tailleFichier);
     printf("nom du fichier a recevoir : %s \n",nomDeFichier);
 
-    char * path = malloc(sizeof(char)*(strlen(DIR_DL) + strlen(nomDeFichier) + 2));
-    strcpy(path, DIR_DL);
-    strcat(path, "/");
-    strcat(path, nomDeFichier);
+    char * path = NULL;
 
-    printf("%s \n", path);
+    if(pathfile == NULL ){
+       path = malloc(sizeof(char)*(strlen(DIR_DL) + strlen(nomDeFichier) + 2));
+      strcpy(path, DIR_DL);
+      strcat(path, "/");
+      strcat(path, nomDeFichier);
+
+
+    }else{
+       path = malloc(sizeof(char)*(strlen(pathfile) + strlen(nomDeFichier) + 2));
+      //on supprime un retour a la ligne provenant de l'envoie précédent.
+       delete_retC(pathfile);      
+       
+       strcpy(path, pathfile);
+       strcat(path, "/");
+       strcat(path, nomDeFichier);
+    }
+    
 
     fichier = fopen(path, "wb");
     if (fichier != NULL) {
@@ -293,15 +304,3 @@ int reception_fichier(void* sock)
 }
 
 
-void create_connexion(){
-
-}
-
-/// TODO les envoies d'acquittement.
-void send_ACK(){
-
-}
-
-void recv_ACK(){
-
-}

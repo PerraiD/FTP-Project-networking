@@ -1,6 +1,8 @@
 /*----------------------------------------------
   Serveur à lancer avant le client
   ------------------------------------------------*/
+
+#define DIR_DL "./" // a revoir !
 #include <stdlib.h>
 #include <stdio.h>
 #include <linux/types.h> 	/* pour les sockets */
@@ -90,7 +92,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    mkdir(DIR_DL, 0777);
+    //mkdir(DIR_DL, 0777);
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -157,7 +159,7 @@ int main(int argc, char **argv) {
             //ACK
             int actionR= recv(nouv_socket_descriptor_cmd,&action,sizeof(int),0);
             char * nomDeFichier;
-           
+            char * toDl; 
             while(action != EXIT){
 
                 if(action>0){ // si une action est envoyer par le client on la traite
@@ -166,10 +168,17 @@ int main(int argc, char **argv) {
 
                             case UPLOAD:
                                 printf("action UPLOAD \n");
-
-                               if(reception_fichier(&nouv_socket_descriptor_cmd) == 1){
-                                    ack=1;
-                                    send(nouv_socket_descriptor_cmd,&ack,sizeof(int),0);
+                                
+                                 //fichier sur le serveur ou déposer le fichier.
+                                toDl = recv_string(nouv_socket_descriptor_cmd);
+                                if(toDl != NULL){
+                                           
+                                       if(reception_fichier(&nouv_socket_descriptor_cmd,toDl) == 1){
+                                            ack=1;
+                                            send(nouv_socket_descriptor_cmd,&ack,sizeof(int),0);
+                                        }
+                                }else{
+                                    printf("erreur de reception du chemin ou sauvegarder le fichier");
                                 }
                                  
                             break;
@@ -178,12 +187,14 @@ int main(int argc, char **argv) {
                                 printf("action DOWNLAOD \n");
                                 //reception du nom de fichier a envoyer au client
                                 //todo vérification de la réception des éléments
-                                //réception du nom
-                                 nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
-                                //transfert du fichier demander;
-                                if(nomDeFichier != NULL){
-                                    transfert_fichier(nouv_socket_descriptor_cmd,nomDeFichier);
-                                }
+                                   
+                                     
+                                     nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
+                                    //transfert du fichier demander;
+                                    if(nomDeFichier != NULL){
+                                        transfert_fichier(nouv_socket_descriptor_cmd,nomDeFichier);
+                                    }
+
 
                             break;
 

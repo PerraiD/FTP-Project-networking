@@ -2,6 +2,8 @@
 Client a lancer apres le serveur avec la commande :
 client <adresse-serveur>
 ------------------------------------------------------------*/
+#define DIR_DL "./"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <linux/types.h>
@@ -16,7 +18,7 @@ client <adresse-serveur>
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 
-#define DIR_DL "./"
+
 
 
 typedef struct sockaddr sockaddr;
@@ -114,7 +116,7 @@ int main(int argc, char **argv) {
       int ack = 0;
 
     while(choix_menu != EXIT){
-
+        printf("\n ---------------------------------------------\n");
         printf("Choissisez votre action en indiquant le numéro : \n");
         printf("1 - télécharger un fichier sur le serveur (PUT) \n");
         printf("2 - télécharger un ficher  du serveur (GET) \n");
@@ -124,7 +126,7 @@ int main(int argc, char **argv) {
 
         switch(choix_menu){
             case UPLOAD:
-                printf("action d'upload demander \n");
+                
                 //on avertie le serveur de ce que l'on veux faire
                 if(execute_action(UPLOAD,socket_descriptor)>0){
 
@@ -134,14 +136,27 @@ int main(int argc, char **argv) {
                      // possibilité de faire une commande
                      scanf("%s",filePath);
                      //transfert du fichier.
+                     //envoie du pwd pour que le serveur enregistre le fichier au bon endroit
+                    
+                     send_string(socket_descriptor,pwd);
 
-                     transfert_fichier(socket_descriptor,filePath);
-                     int rack=recv(socket_descriptor,&ack,sizeof(int),0);
-                     if(rack>1 && ack==1){
-                       printf("fichier correctement envoyée \n");
+                     //char cmd[100];
+                     //snprintf(cmd,100,"%s %s",pwd,filePath);                   
+  
+
+                     if(file_exists(filePath)){                
+                         transfert_fichier(socket_descriptor,filePath);
+                         int rack=recv(socket_descriptor,&ack,sizeof(int),0);
+                         if(rack>1 && ack==1){
+                           printf("fichier correctement envoyée \n");
+                         }else{
+                            perror("erreur de l'envoie de du fichier !");
+                         }
                      }else{
-                        perror("erreur de l'envoie de du fichier !");
-                     }
+                      printf("erreur le fichier n'est pas  disponible sur votre espace de travail \n");
+
+                  }
+                    
                 }
 
             break;
@@ -150,16 +165,16 @@ int main(int argc, char **argv) {
                   printf("indiquez le fichier que vous souhaitez télécharger :\n");
                   //affichage du fichier courant
                   scanf("%s",filePath);
-                                    
-                  char cmd[100];
-                  snprintf(cmd,100,"%s %s",pwd,filePath);
+                 
+                  //test de l'existance du fichier sur le serveur
 
-                  //demande d'existance du fichier sur le serveur
-                  int rack =0;
-              
-                   //send du nom de fichier;
-                  send_string(socket_descriptor,filePath);
-                  reception_fichier(&socket_descriptor);
+                   //envoie du nom de fichier
+                    send_string(socket_descriptor,filePath);
+
+                     //file path null car on souhaite qu'il le télécharge dans le dossier courant
+                    reception_fichier(&socket_descriptor,NULL); 
+                 
+
 
                 }else{
                     perror("l'action que vous avez demandé n'a pas pu aboutir");
@@ -231,18 +246,19 @@ int main(int argc, char **argv) {
                               int rfok=recv(socket_descriptor,&fok,sizeof(int),0);
 
                               if(rfok>0 && fok==1){
-                                if(filePath!="../"){
+
+                                if(!strstr(filePath,"../")){
                                     char cd[100]="";
                                     pwd=strtok(pwd,"\n");
                                     strcat(pwd,"/");
                                     strcat(pwd,filePath);
                                   }else{
-                                    printf("c'est la chaine ../");
+                                    printf("on ne peut pas remonter dans le fichier encore");
                                   }
 
 
                               }else{
-                                printf("le dossier que vous souhaitez atteindre est incorrecte");
+                                printf("le dossier que vous souhaitez atteindre est incorrecte \n");
                               }
 
                             //voir modification du pwd en fonction du chemin demander
