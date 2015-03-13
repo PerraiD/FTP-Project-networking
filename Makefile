@@ -5,12 +5,12 @@ LDFLAGS=-lpthread
 all:client server
 
 # client
-client:client.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+client:client.c libnet.c
+	$(CC) -o $@ $< $(LDFLAGS)
 
 #server
-server:server.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+server:server.c libnet.c
+	$(CC) -o $@ $< $(LDFLAGS)
 
 
 .PHONY: clean mrproper

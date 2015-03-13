@@ -1,7 +1,9 @@
 /*----------------------------------------------
   Serveur à lancer avant le client
   ------------------------------------------------*/
+
 #define DIR_DL "./"
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,7 +42,7 @@ void send_cmd(char * cmd,int socket){
     delete_retC(cmd_t);
 
     cmdF = popen(cmd_t, "r");
-    char tmp[200]="";
+    char tmp[300]="";
 
 
     if(cmdF!=NULL){
@@ -88,7 +90,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    //mkdir(DIR_DL,777);
+
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -165,7 +167,8 @@ int main(int argc, char **argv) {
 
             //ACK
             int actionR= recv(nouv_socket_descriptor_cmd,&action,sizeof(int),0);
-            char * nomDeFichier;
+            
+            char * filePath;
             char * toDl;
             while(action != EXIT){
 
@@ -197,20 +200,25 @@ int main(int argc, char **argv) {
                             break;
 
                         case DOWLOAD:
-                            printf("action DOWNLAOD \n");
+                            printf("action DOWNLOAD \n");
                             //reception du nom de fichier a envoyer au client
                             //todo vérification de la réception des éléments
                             int downok=0;
+							char pass[200]="";
+							
 
-                            nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
-
-                            if(nomDeFichier != NULL){    //transfert du fichier demander;
-                                if(file_exists(nomDeFichier)){
+                            filePath= recv_string(nouv_socket_descriptor_cmd);
+						
+                            printf("%s\n",filePath);
+                            printf(" %d \n", file_exists(filePath));
+                            if(filePath != NULL){   
+                                if(file_exists(filePath)){
                                     downok = 1;
 
                                     if(send(nouv_socket_descriptor_cmd,&downok,sizeof(int),0)>0){
 
-                                        transfert_fichier(nouv_socket_descriptor_cmd,nomDeFichier);
+                                          
+                                        transfert_fichier(nouv_socket_descriptor_cmd,filePath);
                                     }
                                 }else {
                                     send(nouv_socket_descriptor_cmd,&downok,sizeof(int),0);
