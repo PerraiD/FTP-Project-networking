@@ -1,7 +1,7 @@
 /*----------------------------------------------
   Serveur à lancer avant le client
   ------------------------------------------------*/
-#define DIR_DL "/home/david/fileTMP"
+#define DIR_DL "/tmp/fileFTP"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    mkdir(DIR_DL, S_IRUSR | S_IWUSR | S_IRGRP);
+    mkdir(DIR_DL, S_IRWXU | S_IRGRP | S_IXGRP);
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -151,12 +151,12 @@ int main(int argc, char **argv) {
 
             //envoie a la connexion du client du chemin ou il se trouve.
 
-           // FILE * pwdC = popen("pwd","r");
+            // FILE * pwdC = popen("pwd","r");
             //char  pwd[200];
             //char contents[200]="";
 
             //while (fgets(pwd, 200, pwdC) != NULL){
-             //    strcat(contents,pwd);
+            //    strcat(contents,pwd);
             //}
             //delete_retC(contents);
             //strcat(contents,"/server-folder");
