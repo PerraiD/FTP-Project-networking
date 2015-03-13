@@ -201,11 +201,15 @@ int main(int argc, char **argv) {
                             //reception du nom de fichier a envoyer au client
                             //todo vérification de la réception des éléments
                             int downok=0;
+							char pass[200]="";
+							
 
                             nomDeFichier= recv_string(nouv_socket_descriptor_cmd);
+							strcat(pass,DIR_DL);								
+							printf("%s",pass);
 
                             if(nomDeFichier != NULL){    //transfert du fichier demander;
-                                if(file_exists(nomDeFichier)){
+                                if(file_exists(pass)){
                                     downok = 1;
 
                                     if(send(nouv_socket_descriptor_cmd,&downok,sizeof(int),0)>0){
