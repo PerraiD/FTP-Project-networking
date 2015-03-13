@@ -1,7 +1,7 @@
 /*----------------------------------------------
   Serveur à lancer avant le client
   ------------------------------------------------*/
-#define DIR_DL "/home/david/fileTMP"
+#define DIR_DL "./"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
 
     // create directory of file server
-    mkdir(DIR_DL,777);
+    //mkdir(DIR_DL,777);
 
     /* initialisation de la structure adresse_locale avec les infos recuperees */
 
@@ -151,17 +151,17 @@ int main(int argc, char **argv) {
 
             //envoie a la connexion du client du chemin ou il se trouve.
 			
-           // FILE * pwdC = popen("pwd","r");
-            //char  pwd[200];
-            //char contents[200]="";
+           FILE * pwdC = popen("pwd","r");
+            char  pwd[200];
+            char contents[200]="";
 
-            //while (fgets(pwd, 200, pwdC) != NULL){
-             //    strcat(contents,pwd);
-            //}
-            //delete_retC(contents);
-            //strcat(contents,"/server-folder");
+            while (fgets(pwd, 200, pwdC) != NULL){
+                 strcat(contents,pwd);
+            }
+            delete_retC(contents);
+            strcat(contents,"/server-folder");
 
-            send_string(nouv_socket_descriptor_cmd,DIR_DL);
+            send_string(nouv_socket_descriptor_cmd,contents);
 
             //ACK
             int actionR= recv(nouv_socket_descriptor_cmd,&action,sizeof(int),0);
