@@ -35,7 +35,7 @@ int file_exists (char * fileName)
     struct stat buf;
     int i = stat ( fileName, &buf );
     /* File found */
-    return (i == 0);
+    return (i == 0)?1:0;
     /*
        if ( i == 0 )
        {

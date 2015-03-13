@@ -247,6 +247,13 @@ int main(int argc, char **argv) {
                             printf("chemin (dossier ou ../) auquel accéder : \n ");
                             scanf("%s",filePath);
                             //envoie d'une demande au serveur pour vérifier l'existance du dossier demandé
+                            if (filePath[0] != '/') {
+                                char tmp[300];
+                                strcpy(tmp, pwd);
+                                strcat(tmp, "/");
+                                strcat(tmp, filePath);
+                                strcpy(filePath, tmp);
+                            }
                             send_string(socket_descriptor,filePath);
                             int fok=0;
 
