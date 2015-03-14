@@ -1,14 +1,21 @@
 # FTP-Project-networking
 A small ftp project written in C for the networking course in MASTER ALMA
 
-# Compilation
+## Compilation
 
-go to the folder and do ./make
+go to the folder and do `make`
 
-#Launch a client
+**It makes sense but we need to launch server before launch client**
 
-./client server-adress (i.e 140.20.10.0);
+## Launch server
 
-# Launch server
-
+```
 ./server
+```
+
+## Launch a client
+
+```
+./client server-adress
+```
+Replace server-adress by its ip (i.e 140.20.10.5);
