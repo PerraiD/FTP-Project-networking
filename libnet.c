@@ -25,17 +25,32 @@ void delete_retC(char * chaine){
     if( t ) *t = '\0';
 }
 
+void delete_escape(char * chaine){
+	char * t = strchr(chaine , ' ' );
+    if( t ) *t = '\0';
+
+}
 
 /**
   test d'existence d'un fichier ou dossier.
   */
-int file_exists (char * fileName)
-{
-    struct stat buf;
-    int i = stat ( fileName, &buf );
+int folder_exists (char * folderPath)
+{	
+    
+	/*struct stat buf;
+    int i = stat ( fileName, &buf );*/
+	int i = access(folderPath, F_OK);
     /* File found */
     return (i == 0)?1:0;
 
+}
+
+int file_exists (char * filePath){
+	delete_escape(filePath);
+	FILE *fichier = NULL;
+	fichier = fopen(filePath,"r");
+ 
+	return (fichier == NULL)?0:1;
 }
 
 /**

@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
 
                             filePath= recv_string(nouv_socket_descriptor_cmd);
 						
-                            printf("%s\n",filePath);
+                          
                             printf(" %d \n", file_exists(filePath));
                             if(filePath != NULL){   
                                 if(file_exists(filePath)){
@@ -236,7 +236,7 @@ int main(int argc, char **argv) {
                             char * filePath=recv_string(nouv_socket_descriptor_cmd);
                             delete_retC(filePath);
 
-                            if(file_exists(filePath)){
+                            if(folder_exists(filePath)){
                                 fok=1;
                                 sfok=send(nouv_socket_descriptor_cmd,&fok,sizeof(int),0);
                                 if(sfok > 0){
@@ -263,7 +263,7 @@ int main(int argc, char **argv) {
                             //récupération d'une demande de vérification
                             char * path=recv_string(nouv_socket_descriptor_cmd);
                             delete_retC(path);
-                            int f_ok= file_exists(path);
+                            int f_ok= folder_exists(path);
                             printf("%d \n",f_ok);
                             send(nouv_socket_descriptor_cmd,&f_ok,sizeof(int),0);
 
