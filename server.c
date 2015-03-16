@@ -30,7 +30,6 @@ typedef struct servent servent;
 // a voir pour l'histoire d'un chemin fictif pour le pwd ou seulement dans les sous dossier du serveur.
 void send_cmd(char * cmd,int socket){
 
-    printf("commande :  %s\n",cmd);
     FILE* cmdF;
     char cmd_c[100]="";
     char cmd_t[100]="";
@@ -177,7 +176,7 @@ int main(int argc, char **argv) {
                     switch(action){
 
                         case UPLOAD:
-                            printf("action UPLOAD \n");
+                            printf("commande UPLOAD \n");
                             int upOK=0;
 
                             int rupok = recv(nouv_socket_descriptor_cmd,&upOK,sizeof(int),0);
@@ -189,6 +188,7 @@ int main(int argc, char **argv) {
                                 if(toDl != NULL ){
 
                                     if(reception_fichier(&nouv_socket_descriptor_cmd,toDl) == 1){
+                                        //envoie d'un aquittement au client.
                                         ack=1;
                                         send(nouv_socket_descriptor_cmd,&ack,sizeof(int),0);
                                     }
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
                             break;
 
                         case DOWLOAD:
-                            printf("action DOWNLOAD \n");
+                            printf("commande DOWNLOAD \n");
                             //reception du nom de fichier a envoyer au client
                             //todo vérification de la réception des éléments
                             int downok=0;
@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
                             filePath= recv_string(nouv_socket_descriptor_cmd);
 						
                           
-                            printf(" %d \n", file_exists(filePath));
+                           
                             if(filePath != NULL){   
                                 if(file_exists(filePath)){
                                     downok = 1;
@@ -230,7 +230,7 @@ int main(int argc, char **argv) {
                             break;
 
                         case LS_CMD:
-                            printf("action LS_CMD \n");
+                            printf("commande LS_CMD \n");
                             int fok=0;
                             int sfok=0;
                             char * filePath=recv_string(nouv_socket_descriptor_cmd);
@@ -259,12 +259,12 @@ int main(int argc, char **argv) {
                             break;
 
                         case CD_CMD:
-                            printf("action CD_CMD \n");
+                            printf("commande CD_CMD \n");
                             //récupération d'une demande de vérification
                             char * path=recv_string(nouv_socket_descriptor_cmd);
                             delete_retC(path);
                             int f_ok= folder_exists(path);
-                            printf("%d \n",f_ok);
+                           
                             send(nouv_socket_descriptor_cmd,&f_ok,sizeof(int),0);
 
                             break;

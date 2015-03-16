@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     host = argv[1];
 
 
-    // printf("adresse du serveur  : %s \n", host);
+    
 
     if ((ptr_host = gethostbyname(host)) == NULL) {
         perror("  erreur : impossible de trouver le serveur a partir de son adresse.");
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
 
             case PWD_CMD:
 
-                printf("vous êtes : \n %s",pwd);
+                printf("vous êtes situez : \n %s",pwd);
 
                 break;
 
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
                     snprintf(cmd,200,"ls %s ",pwd);
                     int fok=0;
 
-                    printf("%s\n",cmd);
+                    
                     // on envoie le dossier a partir du quel on va effectué ls.
                     send_string(socket_descriptor,pwd);
                     // on reçois que le serveur possède bien que le dossier.
@@ -255,7 +255,6 @@ int main(int argc, char **argv) {
                     strcat(tmp, "/");
                     strcat(tmp, filePath);
                     strcpy(filePath, tmp);
-                    printf("%s\n",filePath);
                     
                     send_string(socket_descriptor,filePath);
                     int fok=0;
@@ -271,7 +270,7 @@ int main(int argc, char **argv) {
                             strcat(pwd,"/");
                             strcpy(pwd,filePath);
                         }else{
-                            printf("on ne peut pas remonter dans le fichier");
+                            printf("on ne peut pas remonter dans l'arborescence");
                         }
 
 

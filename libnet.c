@@ -166,14 +166,14 @@ void transfert_fichier(int socket_descriptor,char * filePath){
     int bytes_written,bytes_to_write;
 
     FILE* fichier;
-    fichier = fopen(filePath,"ab"); //"données.txt"
+    fichier = fopen(filePath,"ab"); 
     printf(" chemin du fichier : %s\n",filePath);
     long fileSize = taille_fichier(fichier);
 
-    //réouverture car l'ouverturein  précédente avec ab place la tête de lecture a la fin du fichier
+    //réouverture car l'ouverture  précédente avec ab place la tête de lecture a la fin du fichier
     fichier = fopen(filePath,"rb");
 
-    //réecriture de filepath en fileName si pas de / filepath n'est pas modifier
+    //réecriture de filepath en fileName si pas de  / filepath n'est pas modifier
     exctract_file_name(filePath);
     printf(" nom du fichier : %s\n",filePath);
     printf(" taille du fichier a envoyée %ld\n",fileSize);
@@ -213,7 +213,7 @@ void transfert_fichier(int socket_descriptor,char * filePath){
         bytes_to_write = fread(sendBuffer, 1, BUFFER_MAX_SIZE, fichier);
     }
 
-    printf(" send : %d\n", sendi);
+    printf(" nombre d'octets envoyés : %d\n", sendi);
     //close(socket_descriptor);
     fclose(fichier);
 
@@ -252,7 +252,6 @@ int reception_fichier(void* sock, char * pathfile)
     }
 
     printf("taille du fichier a recevoir: %ld \n", tailleFichier);
-    printf("nom du fichier a recevoir : %s \n",nomDeFichier);
 
     char * path = NULL;
 
@@ -299,8 +298,7 @@ int reception_fichier(void* sock, char * pathfile)
 
             recu=recu+bytesReceived;
 
-            printf(" %d \n ",recu);
-
+           
         }
 
 
