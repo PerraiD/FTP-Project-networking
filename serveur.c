@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
        */
     /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
-    adresse_locale.sin_port = htons(2000); // port de commande
+    adresse_locale.sin_port = htons(2001); // port de commande
     /*-----------------------------------------------------------*/
 
     printf("numero de port pour la connexion au serveur : %d \n",
