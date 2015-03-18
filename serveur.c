@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
                  strcat(contents,pwd);
             }
             delete_retC(contents);
-            strcat(contents,"/server-folder");
+            strcat(contents,"/serveur-folder");
 
             send_string(nouv_socket_descriptor_cmd,contents);
 
