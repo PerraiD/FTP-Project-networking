@@ -2,14 +2,14 @@ CFLAGS=-O0 -g
 LDFLAGS=-lpthread
 
 
-all:client server
+all:client serveur
 
 # client
 client:client.c libnet.c
 	$(CC) -o $@ $< $(LDFLAGS)
 
 #server
-server:server.c libnet.c
+server:serveur.c libnet.c
 	$(CC) -o $@ $< $(LDFLAGS)
 
 
@@ -19,5 +19,5 @@ clean:
 	rm -rf *.o
 
 mrproper: clean
-	rm -rf client server
+	rm -rf client serveur
 

@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
        adresse_locale.sin_port = htons(ptr_service->s_port);
        */
     /*-----------------------------------------------------------*/
-
-    /*-----------------------------------------------------------*/
+ 
+   /*-----------------------------------------------------------*/
     /* SOLUTION 2 : utiliser un nouveau numero de port */
     adresse_locale.sin_port = htons(2000);
     /*-----------------------------------------------------------*/
@@ -270,8 +270,8 @@ int main(int argc, char **argv) {
                             strcat(pwd,"/");
                             strcpy(pwd,filePath);
                         }else{
-                            printf("on ne peut pas remonter dans l'arborescence");
-                        }
+                            printf("on ne peut pas remonter dans l'arborescence")
+ ;                       }
 
 
                     }else{
